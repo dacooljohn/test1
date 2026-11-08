@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dig Zombies Shares</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Dig Zombies Shares</h1>
+
+<div class="box">
+    <h2>Buy Shares</h2>
+
+    <input
+        type="text"
+        id="username"
+        placeholder="Roblox Username">
+
+    <select id="shares">
+        <option value="1">1 Share</option>
+        <option value="5">5 Shares</option>
+        <option value="10">10 Shares</option>
+        <option value="25">25 Shares</option>
+    </select>
+
+    <br><br>
+
+    <a href="https://www.roblox.com/game-pass/YOUR_GAMEPASS_ID"
+       target="_blank">
+       Buy Gamepass
+    </a>
+
+    <br><br>
+
+    <button onclick="submitRequest()">
+        I've Bought It
+    </button>
+</div>
+
+<div class="box">
+    <h2>Pending Requests (Admin)</h2>
+    <div id="pending"></div>
+</div>
+
+<div class="box">
+    <h2>Shareholders</h2>
+    <div id="approved"></div>
+</div>
+
+<script>
+
+let requests =
+JSON.parse(localStorage.getItem("shareRequests")) || [];
+
+function saveData() {
+    localStorage.setItem(
+        "shareRequests",
+        JSON.stringify(requests)
+    );
+}
+
+function submitRequest() {
+
+    const username =
+    document.getElementById("username").value.trim();
+
+    const shares =
+    document.getElementById("shares").value;
+
+    if (!username) {
+        alert("Enter a username.");
+        return;
+    }
+
+    requests.push({
+        username,
+        shares,
+        status: "Pending"
+    });
+
+    saveData();
+    render();
+
+    alert("Request submitted!");
+
+    document.getElementById("username").value = "";
+}
+
+function approve(index) {
+
+    requests[index].status = "Approved";
+
+    saveData();
+    render();
+}
+
+function reject(index) {
+
+    requests.splice(index, 1);
+
+    saveData();
+    render();
+}
+
+function render() {
+
+    const pending =
+    document.getElementById("pending");
+
+    const approved =
+    document.getElementById("approved");
+
+    pending.innerHTML = "";
+    approved.innerHTML = "";
+
+    requests.forEach((request, index) => {
+
+        if (request.status === "Pending") {
+
+            pending.innerHTML += `
+            <div>
+                <b>${request.username}</b>
+                wants
+                ${request.shares}
+                shares
+
+                <button onclick="approve(${index})">
+                    Approve
+                </button>
+
+                <button onclick="reject(${index})">
+                    Reject
+                </button>
+
+                <hr>
+            </div>
+            `;
+        }
+
+        if (request.status === "Approved") {
+
+            approved.innerHTML += `
+            <div>
+                ${request.username}
+                - ${request.shares} Shares
+            </div>
+            `;
+        }
+
+    });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
